@@ -76,17 +76,21 @@ class Node:
     #         numberOfConnections <int>: the number of nodes connected to this
     #                                    node
     #         nodes <List[int]>: A list containing the ID's of the connected
-#                                nodes
+    #                            nodes
     #         interfaceWeights <List[int]>: A list containing the weights of
     #                                       the interfaces between the node and
     #                                       the connected nodes. Should be 1 to
     #                                       1 corresponding with the nodes list
+    #         totalNodesInNetwork <int>: the number of nodes in the network, is
+    #                                    used to know how many routes need to
+    #                                    be saved by this node
     # @Return: Void
-    def __init__(self, nodeID, numberOfInterfaces, nodes, interfaceWeights):
+    def __init__(self, nodeID, numberOfInterfaces, nodes, interfaceWeights, totalNodesInNetwork):
         self.nodeID = nodeID
         self.numberOfInterfaces = numberOfInterfaces
         self.interfaces = []
         self.interfaceWeights = []
+        self.totalNodesInNetwork = totalNodesInNetwork
         i = 0
         for node in nodes:
             self.interfaces.append(int(node))
@@ -102,13 +106,33 @@ class Node:
     def LogNode(self):
         LogFile.write("\tNode ID: ")
         LogFile.write(str(self.nodeID))
-        LogFile.write("\n\tNode # Connections: ")
+        LogFile.write("\n\t\tNode # Connections: ")
         LogFile.write(str(self.numberOfInterfaces))
-        LogFile.write("\n\tNodes Connected: ")
+        LogFile.write("\n\t\tNodes Connected: ")
         LogFile.write(str(self.interfaces))
-        LogFile.write("\n\tInterface Weights: ")
+        LogFile.write("\n\t\tInterface Weights: ")
         LogFile.write(str(self.interfaceWeights))
+        LogFile.write("\n\t\tNumber of Nodes in Network: ")
+        LogFile.write(str(self.totalNodesInNetwork))
         LogFile.write("\n")
+        return
+
+class Network:
+    # @Desc: Initializer
+    # @Param: nodeList <List[node]>: List of the nodes in the network
+    # @Return: void
+    def __init__(self, nodeList):
+        self.nodeList = nodeList
+        return
+
+    # @Desc: Logs the nodes and their attritbutes
+    # @Param: Void
+    # @Return: Void
+    def LogNetwork(self):
+        LogFile.write("Logging Network: \n")
+        for node in self.nodeList:
+            node.LogNode()
+        LogFile.write("End Logging Network\n\n")
         return
 
 # @Desc: Reads the nodal information from the file and creates a list of nodes
@@ -146,10 +170,11 @@ def LoadNodeNetwork(nodeFile):
         print("Creating Node: ", nodeID)
 
         # Create Node Object
-        newNode = Node(nodeID, nodeNumConnections, otherNodes, otherWeights)
+        newNode = Node(nodeID, nodeNumConnections, otherNodes, otherWeights,
+                       slightly_less_soup[0])
         nodes.append(newNode)
 
-        # Log the node was created
+        # Log that the the node was created
         LogFile.write("Node ")
         LogFile.write(str(nodeID))
         LogFile.write(" created\n")
@@ -167,7 +192,8 @@ def main():
 
     node_file = input("Enter the file to load node data from: ")
     # Load in nodes to program
-    nodes = LoadNodeNetwork(node_file)
+    network = Network(LoadNodeNetwork(node_file))
+    network.LogNetwork()
 
     return
 
