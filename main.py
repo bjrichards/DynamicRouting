@@ -14,6 +14,7 @@ class Packet:
 
     # @Desc: Initializer
     # @Param: generation_time <float>: the time it takes to create the packet
+    #                                  in ms
     #         size <int>: size in bytes of the packet. Used to determine
     #                     transmission time
     #         flow_id <int>:
@@ -29,9 +30,10 @@ class Packet:
         self.packet_id = packet_id
         self.source = source
         self.destination = destination
+
         return
 
-    # @Desc: Returns the generation_time of the packet
+    # @Desc: Returns the generation_time of the packet in ms
     # @Param: Void
     # @Return: self.generation_time <float>
     def GetGenerationTime(self):
@@ -67,18 +69,57 @@ class Packet:
     def GetDestination(self):
         return self.destination
 
+# @Desc: Node object. Each node makes up a piece of the network
+class Node:
+    # @Desc: Initializer
+    # @Param: nodeID <int>: the ID of the node
+    #         numberOfConnections <int>: the number of nodes connected to this
+    #                                    node
+    #         connectedNodes <List[int]>: A list containing the ID's of the
+    #                                     connected nodes
+    # @Return: Void
+    def __init__(self, nodeID, numberOfConnections, nodes):
+        self.nodeID = nodeID
+        self.numberOfConnections = numberOfConnections
+        self.connectedNodes = []
+        for node in nodes:
+            self.connectedNodes.append(int(node))
+
+        print("\tNode ID: ", self.nodeID)
+        print("\tNode # Connections: ", self.numberOfConnections )
+        print("\tNodes Connected: ", self.connectedNodes)
+
+        return
+
+# @Desc: Reads the nodal information from the file and creates a list of nodes
+#        that make up the network
+# @Param: node_file <string>: the file path and name to open
+# @Return: nodes <List[node]>: List of nodes
+def LoadNodeNetwork(nodeFile):
+    node_file = open(NodeFile, 'r')
+    soup = node_file.read()
+    slightly_less_soup = soup.split("\n")
+    nodes = []
+    for i in range(1, int(slightly_less_soup[0]) + 1):
+        node = slightly_less_soup[i].split(" ")
+        nodeID = int(node[0])
+        nodeNumConnections = int(node[1])
+        otherNodes = []
+        for j in range(1, nodeNumConnections + 1):
+            otherNodes.append(node[j + 1])
+
+        print("Creating Node: ", nodeID)
+        newNode = Node(nodeID, nodeNumConnections, otherNodes)
+        nodes.append(newNode)
+
+    return nodes
+
+# Path and name to file containing the nodes of the network
+NodeFile = "nodes.nd"
 
 def main():
-    print("Creating Packet 1")
-    packet1 = Packet(5.0, 20, 1, 1, 2, 5)
-    print("Packet 1 Created\n")
-
-    print("Packet 1 Generation Time: ", packet1.GetGenerationTime())
-    print("Packet 1 Size: ", packet1.GetSize())
-    print("Packet 1 Flow ID: ", packet1.GetFlowID())
-    print("Packet 1 Packet ID: ", packet1.GetPacketID())
-    print("Packet 1 Source Node: ", packet1.GetSource())
-    print("Packet 1 Destination Node: ", packet1.GetDestination())
+    # Load in nodes to program
+    nodes = LoadNodeNetwork(NodeFile)
 
     return
 
