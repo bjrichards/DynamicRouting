@@ -17,17 +17,17 @@ class Packet:
     #                                  in ms
     #         size <int>: size in bytes of the packet. Used to determine
     #                     transmission time
-    #         flow_id <int>:
-    #         packet_id <int>:
+    #         flowID <int>:
+    #         packetID <int>:
     #         source <int>: which node the packet originated from
     #         destination <int>: which node the packet is meant for
     # @Return: void
-    def __init__(self, generation_time, size, flow_id, packet_id, source,
+    def __init__(self, generation_time, size, flowID, packetID, source,
                  destination):
         self.generation_time = generation_time
         self.size = size
-        self.flow_id = flow_id
-        self.packet_id = packet_id
+        self.flowID = flowID
+        self.packetID = packetID
         self.source = source
         self.destination = destination
 
@@ -47,15 +47,15 @@ class Packet:
 
     # @Desc: Returns the flow id of the packet
     # @Param: Void
-    # @Return: self.flow_id <int>
+    # @Return: self.flowID <int>
     def GetFlowID(self):
-        return self.flow_id
+        return self.flowID
 
     # @Desc: Returns the packet id of the packet
     # @Param: Void
-    # @Return: self.packet_id <id>
+    # @Return: self.packetID <id>
     def GetPacketID(self):
-        return self.packet_id
+        return self.packetID
 
     # @Desc: Returns the source node id of the packet
     # @Param: Void
@@ -129,10 +129,18 @@ class Network:
     # @Param: Void
     # @Return: Void
     def LogNetwork(self):
-        LogFile.write("Logging Network: \n")
+        LogFile.write("Logging Network \n")
         for node in self.nodeList:
             node.LogNode()
         LogFile.write("End Logging Network\n\n")
+        return
+
+    # @Desc: Runs through all nodes to find the optimal routes from each node
+    #        to the other nodes.
+    # @Param: Void
+    # @Return: Void
+    def CreateRoutes(self):
+
         return
 
 # @Desc: Reads the nodal information from the file and creates a list of nodes
@@ -190,10 +198,13 @@ LogFile = open(LogFileName, 'w') # Opening of the log file
 
 def main():
 
-    node_file = input("Enter the file to load node data from: ")
-    # Load in nodes to program
-    network = Network(LoadNodeNetwork(node_file))
-    network.LogNetwork()
+    nodeFile = input("Enter the file to load node data from: ")
+    # Load in nodes to the network
+    network = Network(LoadNodeNetwork(nodeFile))
+    network.LogNetwork() # Log the network
+
+    # Find optimal routes between nodes and save those routes
+    network.CreateRoutes()
 
     return
 
