@@ -78,16 +78,16 @@ class Node:
     #         connectedNodes <List[int]>: A list containing the ID's of the
     #                                     connected nodes
     # @Return: Void
-    def __init__(self, nodeID, numberOfConnections, nodes):
+    def __init__(self, nodeID, numberOfInterfaces, nodes):
         self.nodeID = nodeID
-        self.numberOfConnections = numberOfConnections
-        self.connectedNodes = []
+        self.numberOfInterfaces = numberOfInterfaces
+        self.interfaces = []
         for node in nodes:
-            self.connectedNodes.append(int(node))
+            self.interfaces.append(int(node))
 
         print("\tNode ID: ", self.nodeID)
-        print("\tNode # Connections: ", self.numberOfConnections )
-        print("\tNodes Connected: ", self.connectedNodes)
+        print("\tNode # Connections: ", self.interfaces)
+        print("\tNodes Connected: ", self.interfaces)
 
         return
 
