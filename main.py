@@ -85,7 +85,8 @@ class Node:
     #                                    used to know how many routes need to
     #                                    be saved by this node
     # @Return: Void
-    def __init__(self, nodeID, numberOfInterfaces, nodes, interfaceWeights, totalNodesInNetwork):
+    def __init__(self, nodeID, numberOfInterfaces, nodes, interfaceWeights,
+                 totalNodesInNetwork):
         self.nodeID = nodeID
         self.numberOfInterfaces = numberOfInterfaces
         self.interfaces = []
@@ -117,6 +118,7 @@ class Node:
         LogFile.write("\n")
         return
 
+# @Desc: Network object. Holds all the nodes in the network and their routes
 class Network:
     # @Desc: Initializer
     # @Param: nodeList <List[node]>: List of the nodes in the network
