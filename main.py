@@ -1,213 +1,117 @@
-# Description: Final Project for CPE400
-#              - Create a new routing straetgy that maximizes the overall
-#                throughput of a mesh network.
-#              - Simulate the above routing strategy using a simulated
-#                network mesh
-# Creators: Braeden Richards, Adam Cassell, Wen Le Ruan
-# Created: November 27th, 2018
+from collections import defaultdict
 
 
-# @Desc: Packet object. Will be what is sent between nodes within a network
-#        - Packets do not include a payload. Instead, a size of the packet in
-#          terms of bytes will be used to determine transmission time
-class Packet:
+#Graph class used to network the nodes 
+#Contains the nodes, edges, as well as the distances between each one
+#Used mainly to compliment the dijkstra algorithm
+class Graph:
+  def __init__(self):
+    self.nodes = set()
+    self.edges = defaultdict(list)
+    self.distances = {}
 
-    # @Desc: Initializer
-    # @Param: generation_time <float>: the time it takes to create the packet
-    #                                  in ms
-    #         size <int>: size in bytes of the packet. Used to determine
-    #                     transmission time
-    #         flowID <int>:
-    #         packetID <int>:
-    #         source <int>: which node the packet originated from
-    #         destination <int>: which node the packet is meant for
-    # @Return: void
-    def __init__(self, generation_time, size, flowID, packetID, source,
-                 destination):
-        self.generation_time = generation_time
-        self.size = size
-        self.flowID = flowID
-        self.packetID = packetID
-        self.source = source
-        self.destination = destination
+  def add_node(self, value):
+    self.nodes.add(value)
 
-        return
+  def add_edge(self, from_node, to_node, distance):
+    self.edges[from_node].append(to_node)
+    self.edges[to_node].append(from_node)
+    self.distances[(from_node, to_node)] = distance
+    self.distances[(to_node, from_node)] = distance
 
-    # @Desc: Returns the generation_time of the packet in ms
-    # @Param: Void
-    # @Return: self.generation_time <float>
-    def GetGenerationTime(self):
-        return self.generation_time
+  #Removing the edges to simulate a failure of a connection
+  def rmv_edge(self, from_node, to_node, distance):
+    self.edges[from_node].remove(to_node)
+    self.edges[to_node].remove(from_node)
+    self.distances[(from_node, to_node)] = 0
+    self.distances[(to_node, from_node)] = 0
 
-    # @Desc: Returns the size of the packet
-    # @Param: Void
-    # @Return: self.size <int>
-    def GetSize(self):
-        return self.size
 
-    # @Desc: Returns the flow id of the packet
-    # @Param: Void
-    # @Return: self.flowID <int>
-    def GetFlowID(self):
-        return self.flowID
+#Dijkstra's algorithm in finding the shortest path
+#It takes in the starting node and finds the shortest distance for each node
+#Returns the list the of nodes and the distances
+#Returns the path taken to reach that conclusion
+def dijkstraAlg(graph, start):
+  totalDistance = {start: 0}
+  path = {}
 
-    # @Desc: Returns the packet id of the packet
-    # @Param: Void
-    # @Return: self.packetID <id>
-    def GetPacketID(self):
-        return self.packetID
+  nodes = set(graph.nodes)
 
-    # @Desc: Returns the source node id of the packet
-    # @Param: Void
-    # @Return: self.source <int>
-    def GetSource(self):
-        return self.source
+  while nodes: 
+    min_node = None
+    for node in nodes:
+      if node in totalDistance:
+        if min_node is None:
+          min_node = node
+        elif totalDistance[node] < totalDistance[min_node]:
+          min_node = node
 
-    # @Desc: Returns the destination node id of the packet
-    # @Param: Void
-    # @Return: self.destination <int>
-    def GetDestination(self):
-        return self.destination
+    if min_node is None:
+      break
 
-# @Desc: Node object. Each node makes up a piece of the network
-class Node:
-    # @Desc: Initializer
-    # @Param: nodeID <int>: the ID of the node
-    #         numberOfConnections <int>: the number of nodes connected to this
-    #                                    node
-    #         nodes <List[int]>: A list containing the ID's of the connected
-    #                            nodes
-    #         interfaceWeights <List[int]>: A list containing the weights of
-    #                                       the interfaces between the node and
-    #                                       the connected nodes. Should be 1 to
-    #                                       1 corresponding with the nodes list
-    #         totalNodesInNetwork <int>: the number of nodes in the network, is
-    #                                    used to know how many routes need to
-    #                                    be saved by this node
-    # @Return: Void
-    def __init__(self, nodeID, numberOfInterfaces, nodes, interfaceWeights,
-                 totalNodesInNetwork):
-        self.nodeID = nodeID
-        self.numberOfInterfaces = numberOfInterfaces
-        self.interfaces = []
-        self.interfaceWeights = []
-        self.totalNodesInNetwork = totalNodesInNetwork
-        i = 0
-        for node in nodes:
-            self.interfaces.append(int(node))
-            self.interfaceWeights.append(int(interfaceWeights[i]))
-            i = i + 1
+    nodes.remove(min_node)
+    current_weight = totalDistance[min_node]
 
-        self.LogNode()
-        return
+    #Takes the edges and compares them with the different routes
+    #Takes the minimum of the distances and uses that as
+    #the shortest distance
+    for edge in graph.edges[min_node]:
+      weight = current_weight + graph.distances[(min_node, edge)]
+      if edge not in totalDistance or weight < totalDistance[edge]:
+        totalDistance[edge] = weight
+        path[edge] = min_node
 
-    # @Desc: Logs the variables of this object
-    # @Param: Void
-    # @Return: Void
-    def LogNode(self):
-        LogFile.write("\tNode ID: ")
-        LogFile.write(str(self.nodeID))
-        LogFile.write("\n\t\tNode # Connections: ")
-        LogFile.write(str(self.numberOfInterfaces))
-        LogFile.write("\n\t\tNodes Connected: ")
-        LogFile.write(str(self.interfaces))
-        LogFile.write("\n\t\tInterface Weights: ")
-        LogFile.write(str(self.interfaceWeights))
-        LogFile.write("\n\t\tNumber of Nodes in Network: ")
-        LogFile.write(str(self.totalNodesInNetwork))
-        LogFile.write("\n")
-        return
+    #Returns the nodes and the distances as well as the set of paths taken
+  return totalDistance, path
 
-# @Desc: Network object. Holds all the nodes in the network and their routes
-class Network:
-    # @Desc: Initializer
-    # @Param: nodeList <List[node]>: List of the nodes in the network
-    # @Return: void
-    def __init__(self, nodeList):
-        self.nodeList = nodeList
-        return
 
-    # @Desc: Logs the nodes and their attritbutes
-    # @Param: Void
-    # @Return: Void
-    def LogNetwork(self):
-        LogFile.write("Logging Network \n")
-        for node in self.nodeList:
-            node.LogNode()
-        LogFile.write("End Logging Network\n\n")
-        return
 
-    # @Desc: Runs through all nodes to find the optimal routes from each node
-    #        to the other nodes.
-    # @Param: Void
-    # @Return: Void
-    def CreateRoutes(self):
 
-        return
 
-# @Desc: Reads the nodal information from the file and creates a list of nodes
-#        that make up the network
-# @Param: nodeFile <string>: the file path and name to open
-# @Return: nodes <List[node]>: List of nodes
-def LoadNodeNetwork(nodeFile):
-    # Logging the opening of the node file
-    LogFile.write("Opening Node file: ")
-    LogFile.write(nodeFile)
-    LogFile.write("\n")
-    node_file = open(nodeFile, 'r') # Open node file
 
-    soup = node_file.read()
-    slightly_less_soup = soup.split("\n")
-    nodes = []
+#WHAT WE STILL NEED
+#A parser to read the log file into the format shown in main function
+#A probability of failure in each node and edge
+#Dynamic programming
+#
+#
+#
 
-    # Parse the soup for node data, and create node objects with that data
-    for i in range(1, int(slightly_less_soup[0]) + 1):
-        node = slightly_less_soup[i].split(" ")
-        nodeID = int(node[0])
-        nodeNumConnections = int(node[1])
-        otherNodes = []
-        otherWeights = []
 
-        for j in range(1, nodeNumConnections + 1):
-            group = node[j+1].split(":")
-            otherNodes.append(group[0])
-            otherWeights.append(group[1])
 
-        # Log which node is being Created
-        LogFile.write("Creating Node: ")
-        LogFile.write(str(nodeID))
-        LogFile.write("\n")
-        print("Creating Node: ", nodeID)
-
-        # Create Node Object
-        newNode = Node(nodeID, nodeNumConnections, otherNodes, otherWeights,
-                       slightly_less_soup[0])
-        nodes.append(newNode)
-
-        # Log that the the node was created
-        LogFile.write("Node ")
-        LogFile.write(str(nodeID))
-        LogFile.write(" created\n")
-        print("Node ", nodeID, " created")
-
-    LogFile.write("Closing file\n\n")
-    node_file.close()
-    return nodes
-
-# File name to log to
-LogFileName = "log.log"
-LogFile = open(LogFileName, 'w') # Opening of the log file
 
 def main():
 
-    nodeFile = input("Enter the file to load node data from: ")
-    # Load in nodes to the network
-    network = Network(LoadNodeNetwork(nodeFile))
-    network.LogNetwork() # Log the network
+    g = Graph()
+    g.add_node('a')
+    g.add_node('b')
+    g.add_node('c')
+    g.add_node('d')
+    g.add_node('e')
+    g.add_node('f')
+    g.add_node('g')
+    g.add_node('h')
 
-    # Find optimal routes between nodes and save those routes
-    network.CreateRoutes()
+    g.add_edge('a', 'b', 10)
+    g.add_edge('a', 'c', 15)
+    g.add_edge('b', 'c', 25)
+    g.add_edge('b', 'd', 10)
+    g.add_edge('c', 'd', 10)
+    g.add_edge('c', 'e', 20)
+    g.add_edge('d', 'f', 30)
+    g.add_edge('e', 'f', 15)
+    g.add_edge('e', 'g', 10)
+    g.add_edge('g', 'h', 10)
 
+    while userInput is not "end":
+    print(dijkstraAlg(g, 'a'))
+    g.rmv_edge('c', 'e', 20)
+    print(dijkstraAlg(g, 'a'))
+    g.add_edge('c', 'e', 20)
+    print(dijkstraAlg(g, 'a'))
+
+
+    
     return
 
 if __name__ == '__main__': main()
