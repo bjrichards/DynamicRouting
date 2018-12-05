@@ -1,3 +1,8 @@
+# CPE 400 Final Project
+# Created November 27, 2018
+# Written by: Braeden Richards, Wen Le Ruan, Adam Cassell
+
+# Imports
 from collections import defaultdict
 
 
@@ -70,46 +75,49 @@ def dijkstraAlg(graph, start):
 
 
 #WHAT WE STILL NEED
-#A parser to read the log file into the format shown in main function
 #A probability of failure in each node and edge
 #Dynamic programming
-#
-#
-#
 
-# Will document later
+# @Desc: Reads the nodes in from the nodes.nd file and stores it in a graph
+# @Param: Void
+# @Return: <Graph> graph: a graph containing the nodes and their edges
 def loadGraph():
     graph = Graph()
     fileToRead = "nodes.nd"
     fileIn = open(fileToRead, "r")
     soup = fileIn.read()
 
+    # Break the soup up into list items split by new lines
     lineSeperated = soup.split("\n")
     almostThere = []
+    # Split the list into a list of lists seperated by colons
     for piece in lineSeperated:
         almostThere.append(piece.split(":"))
 
+    # Get rid of the lines that don't include data, such as headers
     almostThere[0].pop(0)
     almostThere[1].pop(0)
     almostThere.pop(2)
-    # print(almostThere)
 
+    # Get the number of nodes in the graph
     numOfNodes = int(almostThere[0][0])
-    almostThere.pop(0)
-    # print("Num of Nodes: ", numOfNodes)
+    almostThere.pop(0) # Pop to make the next parsing easier
 
+    # Gather the nodes from the soup
     nodes = almostThere[0][0].split(" ")
-    nodes.pop(0)
-    almostThere.pop(0)
-    # print("Nodes: ", nodes)
+    nodes.pop(0) # Pop as the first list item is a ' ' due to how file is written
+    almostThere.pop(0) # Pop to make the next parsing easier
 
+    # Since all that's left in almostThere is the edges, just make the edges
+    #   list the almostThere list
     edges = almostThere
-    edges.pop()
-    # print("Edges: ", edges)
+    edges.pop() # Pop the first list item since it is a ' '
 
+    # Add the nodes to the graph
     for node in nodes:
         graph.add_node(node)
 
+    # Add the edges to the graph
     for edge in edges:
         pieces = edge[0].split(' ')
         graph.add_edge(pieces[0], pieces[1], int(pieces[2]))
