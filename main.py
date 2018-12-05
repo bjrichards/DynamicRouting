@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 
-#Graph class used to network the nodes 
+#Graph class used to network the nodes
 #Contains the nodes, edges, as well as the distances between each one
 #Used mainly to compliment the dijkstra algorithm
 class Graph:
@@ -37,7 +37,7 @@ def dijkstraAlg(graph, start):
 
   nodes = set(graph.nodes)
 
-  while nodes: 
+  while nodes:
     min_node = None
     for node in nodes:
       if node in totalDistance:
@@ -77,33 +77,49 @@ def dijkstraAlg(graph, start):
 #
 #
 
+# Will document later
+def loadGraph():
+    graph = Graph()
+    fileToRead = "nodes.nd"
+    fileIn = open(fileToRead, "r")
+    soup = fileIn.read()
 
+    lineSeperated = soup.split("\n")
+    almostThere = []
+    for piece in lineSeperated:
+        almostThere.append(piece.split(":"))
+
+    almostThere[0].pop(0)
+    almostThere[1].pop(0)
+    almostThere.pop(2)
+    # print(almostThere)
+
+    numOfNodes = int(almostThere[0][0])
+    almostThere.pop(0)
+    # print("Num of Nodes: ", numOfNodes)
+
+    nodes = almostThere[0][0].split(" ")
+    nodes.pop(0)
+    almostThere.pop(0)
+    # print("Nodes: ", nodes)
+
+    edges = almostThere
+    edges.pop()
+    # print("Edges: ", edges)
+
+    for node in nodes:
+        graph.add_node(node)
+
+    for edge in edges:
+        pieces = edge[0].split(' ')
+        graph.add_edge(pieces[0], pieces[1], int(pieces[2]))
+
+    return graph
 
 
 def main():
 
-    g = Graph()
-    g.add_node('a')
-    g.add_node('b')
-    g.add_node('c')
-    g.add_node('d')
-    g.add_node('e')
-    g.add_node('f')
-    g.add_node('g')
-    g.add_node('h')
-
-    g.add_edge('a', 'b', 10)
-    g.add_edge('a', 'c', 15)
-    g.add_edge('b', 'c', 25)
-    g.add_edge('b', 'd', 10)
-    g.add_edge('c', 'd', 10)
-    g.add_edge('c', 'e', 20)
-    g.add_edge('d', 'f', 30)
-    g.add_edge('e', 'f', 15)
-    g.add_edge('e', 'g', 10)
-    g.add_edge('g', 'h', 10)
-
-    while userInput is not "end":
+    g = loadGraph()
     print(dijkstraAlg(g, 'a'))
     g.rmv_edge('c', 'e', 20)
     print(dijkstraAlg(g, 'a'))
@@ -111,7 +127,7 @@ def main():
     print(dijkstraAlg(g, 'a'))
 
 
-    
+
     return
 
 if __name__ == '__main__': main()
