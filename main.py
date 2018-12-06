@@ -186,13 +186,31 @@ def main():
             graph.rmv_node(nodeToFail)
             input("__Press enter to continue__")
         elif userInput is '3':
-            print("Okie")
+            nodeToAdd = input("What node would you like to add: ")
+            while nodeToAdd in graph.nodes:
+                print("That node already exists.")
+                nodeToAdd = input("What node would you like to add: ")
+            graph.add_node(str(nodeToAdd))
+            print("Node ", nodeToAdd, " added to the network.")
             input("__Press enter to continue__")
         elif userInput == '4':
-            print("Dokie")
+            firstNode = input("What node should the edge start at: ")
+            while firstNode not in graph.nodes:
+                print("That node does not currently exist.")
+                firstNode = input("What node should the edge start at: ")
+            secondNode = input("What node should the edge end at: ")
+            while secondNode not in graph.nodes:
+                print("That node does not currently exist.")
+                secondNode = input("What node should the edge end at: ")
+            weight = input("What should the weight of the edge be: ")
+            while int(weight) < 0:
+                print("Weights need to be 0 or above.")
+                weight = input("What should the weight of the edge be: ")
+            graph.add_edge(str(firstNode), str(secondNode), int(weight))
+            print("Edge is added!")
             input("__Press enter to continue__")
         elif userInput is '5':
-            nodeToStart = '1'
+            nodeToStart = ''
             first = True
             while nodeToStart not in graph.nodes:
                 if first is False:
