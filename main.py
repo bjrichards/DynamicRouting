@@ -10,28 +10,42 @@ from collections import defaultdict
 #Contains the nodes, edges, as well as the distances between each one
 #Used mainly to compliment the dijkstra algorithm
 class Graph:
-  def __init__(self):
-    self.nodes = set()
-    self.edges = defaultdict(list)
-    self.distances = {}
+    def __init__(self):
+        self.nodes = set()
+        self.edges = defaultdict(list)
+        self.distances = {}
     #self.failPerc = set()
 
-  def add_node(self, value):
-    self.nodes.add(value)
+    def add_node(self, value):
+        self.nodes.add(value)
     #self.nodes.add(fail)
 
-  def add_edge(self, start, end, distance):
-    self.edges[start].append(end)
-    self.edges[end].append(start)
-    self.distances[(start, end)] = distance
-    self.distances[(end, start)] = distance
+    def add_edge(self, start, end, distance):
+        self.edges[start].append(end)
+        self.edges[end].append(start)
+        self.distances[(start, end)] = distance
+        self.distances[(end, start)] = distance
 
-  #Removing the edges to simulate a failure of a connection
-  def rmv_edge(self, start, end, distance):
-    self.edges[start].remove(end)
-    self.edges[end].remove(start)
-    self.distances[(start, end)] = 0
-    self.distances[(end, start)] = 0
+    def rmv_node(self, node):
+        self.nodes.remove(str(node))
+        del self.edges[node]
+
+    #Removing the edges to simulate a failure of a connection
+    def rmv_edge(self, start, end, distance):
+        self.edges[start].remove(end)
+        self.edges[end].remove(start)
+        self.distances[(start, end)] = 0
+        self.distances[(end, start)] = 0
+
+    def printAll(self):
+        print("Nodes: ")
+        for node in self.nodes:
+            print(node, " ", end="")
+
+        print("Edges: ")
+        for node in self.nodes:
+            print("Node ", node, "is connected to: ",self.edges[node], " ")
+
 
 
 #Dijkstra's algorithm in finding the shortest path
@@ -104,6 +118,7 @@ def loadGraph(fileName):
 
     # Gather the nodes from the soup
     nodes = almostThere[0][0].split(" ")
+    # print(nodes)
     nodes.pop(0) # Pop as the first list item is a ' ' due to how file is written
     almostThere.pop(0) # Pop to make the next parsing easier
 
@@ -115,6 +130,7 @@ def loadGraph(fileName):
     # Add the nodes to the graph
     for node in nodes:
         graph.add_node(node)
+        # print(node)
 
     # Add the edges to the graph
     for edge in edges:
@@ -124,34 +140,95 @@ def loadGraph(fileName):
     return graph
 
 
+# @Desc: Prints the menu and gets userInput from menu
+# @Param: Void
+# @Return: <int> userInput
+def Menu():
+    print("1) Run until node failure")
+    print("2) Choose node to fail")
+    print("3) Add node")
+    print("4) Add an edge")
+    print("5) Find shortest paths from a node to all others")
+    print("6) Print graph")
+    print("7) Exit program")
+    userInput = input("> ")
+
+    return userInput
+
+def NodeFailure():
+
+    return
+
 def main():
 
-	print("Welcome to the network node failure simulation")
-	fileInput = input("Please enter the node file name: ")
-	print("Reading in node file~")
-	print("Now printing all routes starting from the first node")
-	fileName = fileInput
+    for i in range(0, 100):
+        print("\n")
+    print("Welcome to the network node failure simulation")
+    fileInput = input("Please enter the node file name: ")
+    print("Reading in node file~")
+    print("Now printing all routes starting from the first node")
+    fileName = fileInput
+    graph = loadGraph(fileName)
+    userInput = 90
+
+    while userInput is not '7':
+        for i in range(0, 100):
+            print("\n")
+        userInput = Menu()
+
+        if userInput is '1':
+            print("Routes from node ", list(graph.nodes)[0], "\n", dijkstraAlg(graph, list(graph.nodes)[0]))
+            # while not NodeFailure():
+            #     break
+            input("__Press enter to continue__")
+        elif userInput is '2':
+            nodeToFail = input("Which node should fail: ")
+            graph.rmv_node(nodeToFail)
+            input("__Press enter to continue__")
+        elif userInput is '3':
+            print("Okie")
+            input("__Press enter to continue__")
+        elif userInput == '4':
+            print("Dokie")
+            input("__Press enter to continue__")
+        elif userInput is '5':
+            nodeToStart = '1'
+            first = True
+            while nodeToStart not in graph.nodes:
+                if first is False:
+                    input("Not in the network")
+                else:
+                    first = False
+                nodeToStart = input("What node to start with? ")
+            print("Running Dijkstra's starting with node ", nodeToStart)
+            print(dijkstraAlg(graph, str(nodeToStart)))
+            input("__Press enter to continue__")
+        elif userInput is '6':
+            graph.printAll()
+            input("__Press enter to continue__")
+        elif userInput is '7':
+            break
+        else:
+            print("Not correct input")
+            input("__Press enter to continue__")
 
 	#Keep running with probability of failure
 	#Choose to fail a node
 	#Remove a node completely
 	#Add a node
 		#Add an edge
-	#Show available
 
-
-	g = loadGraph(fileName)
-	print(dijkstraAlg(g, 'a'))
-	g.rmv_edge('f', 'g', 15)
-	print(dijkstraAlg(g, 'a'))
-	g.add_edge('c', 'e', 20)
-	print(dijkstraAlg(g, 'a'))
-	g.add_node('i')
-	g.add_edge('i', 'a', 40)
-	print(dijkstraAlg(g, 'a'))
+	# print(dijkstraAlg(g, 'a'))
+	# g.rmv_edge('f', 'g', 15)
+	# print(dijkstraAlg(g, 'a'))
+	# g.add_edge('c', 'e', 20)
+	# print(dijkstraAlg(g, 'a'))
+	# g.add_node('i')
+	# g.add_edge('i', 'a', 40)
+	# print(dijkstraAlg(g, 'a'))
 
 
 
-	return
+    return
 
 if __name__ == '__main__': main()
