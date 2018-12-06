@@ -4,6 +4,7 @@
 
 # Imports
 from collections import defaultdict
+from random import randint
 
 
 #Graph class used to network the nodes
@@ -14,10 +15,12 @@ class Graph:
         self.nodes = set()
         self.edges = defaultdict(list)
         self.distances = {}
+        self.failurePercentage = defaultdict(list)
     #self.failPerc = set()
 
-    def add_node(self, value):
+    def add_node(self, value, failurePercentage):
         self.nodes.add(value)
+        self.failurePercentage[value].append(failurePercentage)
     #self.nodes.add(fail)
 
     def add_edge(self, start, end, distance):
@@ -29,6 +32,12 @@ class Graph:
     def rmv_node(self, node):
         self.nodes.remove(str(node))
         del self.edges[node]
+        for nodes in self.nodes:
+            for thing in self.edges[nodes]:
+                for i in range(0, len(self.edges[nodes])):
+                    if(self.edges[nodes][i] == node):
+                        del self.edges[nodes][i]
+                        break;
 
     #Removing the edges to simulate a failure of a connection
     def rmv_edge(self, start, end, distance):
@@ -38,13 +47,17 @@ class Graph:
         self.distances[(end, start)] = 0
 
     def printAll(self):
-        print("Nodes: ")
+        print("Nodes: ", end="\n\t")
         for node in self.nodes:
             print(node, " ", end="")
 
-        print("Edges: ")
+        print("\nEdges: ")
         for node in self.nodes:
-            print("Node ", node, "is connected to: ",self.edges[node], " ")
+            print("\tNode ", node, "is connected to: ",self.edges[node], " ")
+
+        print("Nodes Failure Percentages:")
+        for node in self.nodes:
+            print("\tNode ", node, "is ", self.failurePercentage[node][0], "% likely to fail")
 
 
 
@@ -100,8 +113,12 @@ def loadGraph(fileName):
     fileIn = open(fileToRead, "r")
     soup = fileIn.read()
 
+    # Seperate percentage of filure with the rest
+    stuff = soup.split("~~")
+    percentages = stuff[1]
+
     # Break the soup up into list items split by new lines
-    lineSeperated = soup.split("\n")
+    lineSeperated = stuff[0].split("\n")
     almostThere = []
     # Split the list into a list of lists seperated by colons
     for piece in lineSeperated:
@@ -111,6 +128,7 @@ def loadGraph(fileName):
     almostThere[0].pop(0)
     almostThere[1].pop(0)
     almostThere.pop(2)
+    # print(almostThere)
 
     # Get the number of nodes in the graph
     numOfNodes = int(almostThere[0][0])
@@ -128,8 +146,13 @@ def loadGraph(fileName):
     edges.pop() # Pop the first list item since it is a ' '
 
     # Add the nodes to the graph
+    i = 0
+    perc = percentages.split("\n")
+    perc.pop(0)
+    perc.pop(0)
     for node in nodes:
-        graph.add_node(node)
+        graph.add_node(node, int(perc[i].split(" ")[2]))
+        i = i + 1
         # print(node)
 
     # Add the edges to the graph
@@ -155,8 +178,17 @@ def Menu():
 
     return userInput
 
-def NodeFailure():
-
+def NodeFailure(graph):
+    nodeFail = False
+    while nodeFail is False:
+        for node in graph.nodes:
+            check = randint(0,100)
+            if check < graph.failurePercentage[node][0]:
+                print("Node ", node, "has failed!")
+                print("Node ", node, "has been removed from the graph")
+                graph.rmv_node(node)
+                print("All edges of node", node, " now removed")
+                return
     return
 
 def main():
@@ -171,15 +203,15 @@ def main():
     graph = loadGraph(fileName)
     userInput = 90
 
+    # This is just dealing with the menu and the choices of the menu the user
+    #   makes
     while userInput is not '7':
         for i in range(0, 100):
             print("\n")
         userInput = Menu()
-
         if userInput is '1':
-            print("Routes from node ", list(graph.nodes)[0], "\n", dijkstraAlg(graph, list(graph.nodes)[0]))
-            # while not NodeFailure():
-            #     break
+            while not NodeFailure(graph):
+                break
             input("__Press enter to continue__")
         elif userInput is '2':
             nodeToFail = input("Which node should fail: ")
@@ -229,23 +261,6 @@ def main():
         else:
             print("Not correct input")
             input("__Press enter to continue__")
-
-	#Keep running with probability of failure
-	#Choose to fail a node
-	#Remove a node completely
-	#Add a node
-		#Add an edge
-
-	# print(dijkstraAlg(g, 'a'))
-	# g.rmv_edge('f', 'g', 15)
-	# print(dijkstraAlg(g, 'a'))
-	# g.add_edge('c', 'e', 20)
-	# print(dijkstraAlg(g, 'a'))
-	# g.add_node('i')
-	# g.add_edge('i', 'a', 40)
-	# print(dijkstraAlg(g, 'a'))
-
-
 
     return
 

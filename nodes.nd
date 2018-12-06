@@ -1,6 +1,6 @@
 Number of nodes: 8
 Nodes: a b c d e f g h
-Edges (node, node, distance): 
+Edges (node, node, distance):
 a b 10
 a c 15
 b c 25
@@ -11,3 +11,13 @@ d f 30
 e f 15
 f g 10
 g h 10
+~~
+Probability of Failure(%):
+a = 10
+b = 5
+c = 50
+d = 32
+e = 27
+f = 17
+g = 10
+h = 2
