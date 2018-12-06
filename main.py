@@ -178,6 +178,10 @@ def Menu():
 
     return userInput
 
+# @Desc: Runs in a loop until a node fails due to it's own probability of
+#        failure
+# @Param: The graph containing the nodes
+# @Return: void
 def NodeFailure(graph):
     nodeFail = False
     while nodeFail is False:
@@ -209,14 +213,23 @@ def main():
         for i in range(0, 100):
             print("\n")
         userInput = Menu()
+
+        # Run until Node Failure (Due to probability causing random failure)
         if userInput is '1':
-            while not NodeFailure(graph):
-                break
+            NodeFailure(graph)
             input("__Press enter to continue__")
+
+        # Choose a node to fail
         elif userInput is '2':
             nodeToFail = input("Which node should fail: ")
+            while nodeToFail not in graph.nodes:
+                print("That node does not exist")
+                nodeToFail = input("Which node should fail: ")
             graph.rmv_node(nodeToFail)
+            print("Node ", nodeToFail, " has failed.")
             input("__Press enter to continue__")
+
+        # Add a node to the network
         elif userInput is '3':
             nodeToAdd = input("What node would you like to add: ")
             while nodeToAdd in graph.nodes:
@@ -226,6 +239,8 @@ def main():
             graph.add_node(str(nodeToAdd), int(percentageFailure))
             print("Node ", nodeToAdd, " added to the network.")
             input("__Press enter to continue__")
+
+        # Add an edge between two nodes
         elif userInput == '4':
             firstNode = input("What node should the edge start at: ")
             while firstNode not in graph.nodes:
@@ -242,6 +257,8 @@ def main():
             graph.add_edge(str(firstNode), str(secondNode), int(weight))
             print("Edge is added!")
             input("__Press enter to continue__")
+
+        # Finds the shortest path from one node to all the others
         elif userInput is '5':
             nodeToStart = ''
             first = True
@@ -254,11 +271,17 @@ def main():
             print("Running Dijkstra's starting with node ", nodeToStart)
             print(dijkstraAlg(graph, str(nodeToStart)))
             input("__Press enter to continue__")
+
+        # Prints out the info for the nodes in the graph
         elif userInput is '6':
             graph.printAll()
             input("__Press enter to continue__")
+
+        # Exit the program
         elif userInput is '7':
             break
+
+        # If a value that is not supported for user input is entered
         else:
             print("Not correct input")
             input("__Press enter to continue__")
