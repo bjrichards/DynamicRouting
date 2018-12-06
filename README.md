@@ -1,28 +1,9 @@
-# Dynamic Routing Mechanism Design with Focus on Throughput
+# Dynamic routing mechanism design in faulty network
 
 ## Prompt
-Create  and  simulate  a  new routing  strategy  that  maximizes  the  overall  throughput  of  a  mesh  network.
-Throughput  is  affected  by
-many  factors  that  should  be  considered,  such  as  nodal  processing  delay,
-overloaded buffers, loss, etc. The more realistic assumptions you can make for your network, better it is.
+The team will simulate a mesh network where nodes and links may fail (Figure 5). Nodes and links may fail intermittently, as an input to the simulation, each node and link will have a certain probability to fail. When such failure occurs, the network must adapt and re-route to avoid the faulty link/node.
 
 ## Required Resources
 ```
 Python3
 ```
-
-## nodes.nd
-The node network is stored in the file nodes.nd. If changing the network, the format for nodes.nd is:
-```
-#OfNodes
-NID #CN CNID1:CNW1 CNID2:CNW2 ...
-NID #CN CNID1:CNW1 CNID2:CNW2 ...
-NID #CN CNID1:CNW1 CNID2:CNW2 ...
-```
-```
-NID - Node ID <int>
-#CN - Number of connected nodes <int>
-CNID# - Connected node ID # <int>
-CNW# - Connected Node's interface weight <int>
-```
-To see an example, check the included nodes.nd file.
