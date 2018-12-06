@@ -14,22 +14,24 @@ class Graph:
     self.nodes = set()
     self.edges = defaultdict(list)
     self.distances = {}
+    #self.failPerc = set()
 
   def add_node(self, value):
     self.nodes.add(value)
+    #self.nodes.add(fail)
 
-  def add_edge(self, from_node, to_node, distance):
-    self.edges[from_node].append(to_node)
-    self.edges[to_node].append(from_node)
-    self.distances[(from_node, to_node)] = distance
-    self.distances[(to_node, from_node)] = distance
+  def add_edge(self, start, end, distance):
+    self.edges[start].append(end)
+    self.edges[end].append(start)
+    self.distances[(start, end)] = distance
+    self.distances[(end, start)] = distance
 
   #Removing the edges to simulate a failure of a connection
-  def rmv_edge(self, from_node, to_node, distance):
-    self.edges[from_node].remove(to_node)
-    self.edges[to_node].remove(from_node)
-    self.distances[(from_node, to_node)] = 0
-    self.distances[(to_node, from_node)] = 0
+  def rmv_edge(self, start, end, distance):
+    self.edges[start].remove(end)
+    self.edges[end].remove(start)
+    self.distances[(start, end)] = 0
+    self.distances[(end, start)] = 0
 
 
 #Dijkstra's algorithm in finding the shortest path
@@ -44,10 +46,14 @@ def dijkstraAlg(graph, start):
 
   while nodes:
     min_node = None
+
     for node in nodes:
+
       if node in totalDistance:
+
         if min_node is None:
           min_node = node
+
         elif totalDistance[node] < totalDistance[min_node]:
           min_node = node
 
@@ -71,19 +77,12 @@ def dijkstraAlg(graph, start):
 
 
 
-
-
-
-#WHAT WE STILL NEED
-#A probability of failure in each node and edge
-#Dynamic programming
-
 # @Desc: Reads the nodes in from the nodes.nd file and stores it in a graph
 # @Param: Void
 # @Return: <Graph> graph: a graph containing the nodes and their edges
-def loadGraph():
+def loadGraph(fileName):
     graph = Graph()
-    fileToRead = "nodes.nd"
+    fileToRead = fileName
     fileIn = open(fileToRead, "r")
     soup = fileIn.read()
 
@@ -127,15 +126,32 @@ def loadGraph():
 
 def main():
 
-    g = loadGraph()
-    print(dijkstraAlg(g, 'a'))
-    g.rmv_edge('c', 'e', 20)
-    print(dijkstraAlg(g, 'a'))
-    g.add_edge('c', 'e', 20)
-    print(dijkstraAlg(g, 'a'))
+	print("Welcome to the network node failure simulation")
+	fileInput = input("Please enter the node file name: ")
+	print("Reading in node file~")
+	print("Now printing all routes starting from the first node")
+	fileName = fileInput
+
+	#Keep running with probability of failure
+	#Choose to fail a node
+	#Remove a node completely
+	#Add a node
+		#Add an edge
+	#Show available
+
+
+	g = loadGraph(fileName)
+	print(dijkstraAlg(g, 'a'))
+	g.rmv_edge('f', 'g', 15)
+	print(dijkstraAlg(g, 'a'))
+	g.add_edge('c', 'e', 20)
+	print(dijkstraAlg(g, 'a'))
+	g.add_node('i')
+	g.add_edge('i', 'a', 40)
+	print(dijkstraAlg(g, 'a'))
 
 
 
-    return
+	return
 
 if __name__ == '__main__': main()
