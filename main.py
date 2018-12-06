@@ -222,7 +222,8 @@ def main():
             while nodeToAdd in graph.nodes:
                 print("That node already exists.")
                 nodeToAdd = input("What node would you like to add: ")
-            graph.add_node(str(nodeToAdd))
+            percentageFailure = input("What is the % possible failure: ")
+            graph.add_node(str(nodeToAdd), int(percentageFailure))
             print("Node ", nodeToAdd, " added to the network.")
             input("__Press enter to continue__")
         elif userInput == '4':
