@@ -13,3 +13,6 @@ From the project directory, run the following command in the terminal (note: mus
 python3 main.py
 
 You should then be presented with the user-menu and be able to execute the simulation.
+
+## To Do
+Due to circumstances that occurred the day this project was due, I ended up needing to recreate this project in a short time span (~2 hours), so therefore the comments are lacking, the main function is rather horrendous looking since it contains most the code of the menu, and the program as a whole is hard to read through. So as I get free time I am planning to refactor large portions of the project to increase readability and presentation.
